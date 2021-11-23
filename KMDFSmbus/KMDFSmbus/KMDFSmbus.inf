@@ -4,11 +4,11 @@
 
 [Version]
 Signature="$WINDOWS NT$"
-Class=Sample ; TODO: edit Class
-ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171} ; TODO: edit ClassGuid
+Class=System
+ClassGuid={4D36E97D-E325-11CE-BFC1-08002BE10318}
 Provider=%ManufacturerName%
 CatalogFile=KMDFSmbus.cat
-DriverVer= ; TODO: set DriverVer in stampinf property pages
+DriverVer=11/22/2021,1.00.0001
 
 [DestinationDirs]
 DefaultDestDir = 12
@@ -16,12 +16,12 @@ KMDFSmbus_Device_CoInstaller_CopyFiles = 11
 
 ; ================= Class section =====================
 
-[ClassInstall32]
-Addreg=SampleClassReg
+;[ClassInstall32]
+;Addreg=SampleClassReg
 
-[SampleClassReg]
-HKR,,,0,%ClassName%
-HKR,,Icon,,-5
+;[SampleClassReg]
+;HKR,,,0,%ClassName%
+;HKR,,Icon,,-5
 
 [SourceDisksNames]
 1 = %DiskName%,,,""
@@ -35,10 +35,10 @@ WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with
 ;*****************************************
 
 [Manufacturer]
-%ManufacturerName%=Standard,NT$ARCH$
+%ManufacturerName%=Standard,NTamd64
 
-[Standard.NT$ARCH$]
-%KMDFSmbus.DeviceDesc%=KMDFSmbus_Device, Root\KMDFSmbus ; TODO: edit hw-id
+[Standard.NTamd64]
+%KMDFSmbus.DeviceDesc%=KMDFSmbus_Device, PCI\VEN_1022&DEV_790B ; AMD SMBus
 
 [KMDFSmbus_Device.NT]
 CopyFiles=Drivers_Dir
@@ -79,8 +79,8 @@ KmdfLibraryVersion = $KMDFVERSION$
 
 [Strings]
 SPSVCINST_ASSOCSERVICE= 0x00000002
-ManufacturerName="<Your manufacturer name>" ;TODO: Replace with your manufacturer name
-ClassName="Samples" ; TODO: edit ClassName
+ManufacturerName="Josh Inc."
+ClassName="Josh SMBus Device"
 DiskName = "KMDFSmbus Installation Disk"
 KMDFSmbus.DeviceDesc = "KMDFSmbus Device"
 KMDFSmbus.SVCDESC = "KMDFSmbus Service"
