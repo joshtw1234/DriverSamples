@@ -24,6 +24,7 @@ Environment:
 
 EXTERN_C_START
 
+#define LOG_PREFIX "Josh Driver"
 //
 // WDFDRIVER Events
 //

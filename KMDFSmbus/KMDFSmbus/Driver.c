@@ -55,7 +55,7 @@ Return Value:
 --*/
 {
     WDF_DRIVER_CONFIG config;
-    NTSTATUS status;
+    NTSTATUS status = 0;
     WDF_OBJECT_ATTRIBUTES attributes;
 
     //
@@ -63,7 +63,10 @@ Return Value:
     //
     WPP_INIT_TRACING(DriverObject, RegistryPath);
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
+    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "Josh %!FUNC! Entry");
+    DbgPrint(LOG_PREFIX
+        ": DriverEntry message: 0x%x\n",
+        status);
 
     //
     // Register a cleanup callback so that we can call WPP_CLEANUP when
@@ -129,6 +132,9 @@ Return Value:
     status = KMDFSmbusCreateDevice(DeviceInit);
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Exit");
+    DbgPrint(LOG_PREFIX
+        ": KMDFSmbusEvtDeviceAdd message: 0x%x\n",
+        status);
 
     return status;
 }
@@ -157,6 +163,8 @@ Return Value:
     PAGED_CODE();
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
+    DbgPrint(LOG_PREFIX
+        "KMDFSmbusEvtDriverContextCleanup");
 
     //
     // Stop WPP Tracing

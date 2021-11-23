@@ -88,6 +88,8 @@ Return Value:
             status = KMDFSmbusQueueInitialize(device);
         }
     }
-
+    DbgPrint(LOG_PREFIX
+        ": KMDFSmbusCreateDevice message: 0x%x\n",
+        status);
     return status;
 }
