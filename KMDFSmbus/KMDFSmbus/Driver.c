@@ -128,12 +128,13 @@ Return Value:
     PAGED_CODE();
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
-
+    DbgPrint(LOG_PREFIX
+        ": KMDFSmbusEvtDeviceAdd message: Entry\n");
     status = KMDFSmbusCreateDevice(DeviceInit);
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Exit");
     DbgPrint(LOG_PREFIX
-        ": KMDFSmbusEvtDeviceAdd message: 0x%x\n",
+        ": KMDFSmbusEvtDeviceAdd message: Exit 0x%x\n",
         status);
 
     return status;
