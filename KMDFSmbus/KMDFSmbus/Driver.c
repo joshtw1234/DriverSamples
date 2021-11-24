@@ -122,14 +122,12 @@ Return Value:
 --*/
 {
     NTSTATUS status;
-
     UNREFERENCED_PARAMETER(Driver);
-
     PAGED_CODE();
-
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
     DbgPrint(LOG_PREFIX
         ": KMDFSmbusEvtDeviceAdd message: Entry\n");
+
     status = KMDFSmbusCreateDevice(DeviceInit);
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Exit");
@@ -172,3 +170,6 @@ Return Value:
     //
     WPP_CLEANUP(WdfDriverWdmGetDriverObject((WDFDRIVER)DriverObject));
 }
+
+
+
