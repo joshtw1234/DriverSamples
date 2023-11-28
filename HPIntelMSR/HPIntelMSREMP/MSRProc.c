@@ -9,10 +9,10 @@ VOID IntelMSRDemoThread(__in PVOID StartContext)
 	{
 		if (tStart)
 		{
-			KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "KmdfHelloWorld: IntelMSRDemoThread STOP\n"));
+			KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "JoshKMDF: IntelMSRDemoThread STOP\n"));
 			break;
 		}
-		KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "KmdfHelloWorld: IntelMSRDemoThread\n"));
+		KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "JoshKMDF: IntelMSRDemoThread\n"));
 		mSleep(SLEEP_TIME);
 	}
 

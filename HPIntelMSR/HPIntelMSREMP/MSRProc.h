@@ -8,7 +8,7 @@
 /** A Utility to assign relative time for LARGE_INTEGER. */
 #define	SET_RELATIVE_TIME(x, s)	(x.HighPart = -1, x.LowPart = (s))
 
-#define SLEEP_TIME 2000
+#define SLEEP_TIME 1000
 
 BOOLEAN tStart;
 /*

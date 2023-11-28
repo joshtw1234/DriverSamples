@@ -101,7 +101,9 @@ Return Value:
     
     //Stop Thread
     tStart = TRUE;
-    mSleep(5000);
+    mSleep(3000);
+
+    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "JoshKMDF: HPIntelMSREvtDriverContextCleanup END\n"));
 
     //tStart = 0;
 
