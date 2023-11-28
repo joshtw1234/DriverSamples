@@ -19,8 +19,8 @@ Environment:
 
 #ifdef ALLOC_PRAGMA
 #pragma alloc_text (INIT, DriverEntry)
-#pragma alloc_text (PAGE, KMDFSmbusEvtDeviceAdd)
-#pragma alloc_text (PAGE, KMDFSmbusEvtDriverContextCleanup)
+#pragma alloc_text (PAGE, HPIntelMSREvtDeviceAdd)
+#pragma alloc_text (PAGE, HPIntelMSREvtDriverContextCleanup)
 #endif
 
 NTSTATUS
@@ -55,7 +55,7 @@ Return Value:
 --*/
 {
     WDF_DRIVER_CONFIG config;
-    NTSTATUS status = 0;
+    NTSTATUS status;
     WDF_OBJECT_ATTRIBUTES attributes;
 
     //
@@ -63,20 +63,18 @@ Return Value:
     //
     WPP_INIT_TRACING(DriverObject, RegistryPath);
 
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "Josh %!FUNC! Entry");
-    DbgPrint(LOG_PREFIX
-        ": DriverEntry message: 0x%x\n",
-        status);
+    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
+    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "JoshKMDF: DriverEntry\n"));
 
     //
     // Register a cleanup callback so that we can call WPP_CLEANUP when
     // the framework driver object is deleted during driver unload.
     //
     WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
-    attributes.EvtCleanupCallback = KMDFSmbusEvtDriverContextCleanup;
+    attributes.EvtCleanupCallback = HPIntelMSREvtDriverContextCleanup;
 
     WDF_DRIVER_CONFIG_INIT(&config,
-                           KMDFSmbusEvtDeviceAdd
+                           HPIntelMSREvtDeviceAdd
                            );
 
     status = WdfDriverCreate(DriverObject,
@@ -98,7 +96,7 @@ Return Value:
 }
 
 NTSTATUS
-KMDFSmbusEvtDeviceAdd(
+HPIntelMSREvtDeviceAdd(
     _In_    WDFDRIVER       Driver,
     _Inout_ PWDFDEVICE_INIT DeviceInit
     )
@@ -122,24 +120,23 @@ Return Value:
 --*/
 {
     NTSTATUS status;
-    UNREFERENCED_PARAMETER(Driver);
-    PAGED_CODE();
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
-    DbgPrint(LOG_PREFIX
-        ": KMDFSmbusEvtDeviceAdd message: Entry\n");
 
-    status = KMDFSmbusCreateDevice(DeviceInit);
+    UNREFERENCED_PARAMETER(Driver);
+
+    PAGED_CODE();
+
+    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
+    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "JoshKMDF: HPIntelMSREvtDeviceAdd\n"));
+
+    status = HPIntelMSRCreateDevice(DeviceInit);
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Exit");
-    DbgPrint(LOG_PREFIX
-        ": KMDFSmbusEvtDeviceAdd message: Exit 0x%x\n",
-        status);
 
     return status;
 }
 
 VOID
-KMDFSmbusEvtDriverContextCleanup(
+HPIntelMSREvtDriverContextCleanup(
     _In_ WDFOBJECT DriverObject
     )
 /*++
@@ -162,14 +159,10 @@ Return Value:
     PAGED_CODE();
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
-    DbgPrint(LOG_PREFIX
-        "KMDFSmbusEvtDriverContextCleanup");
+    KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "JoshKMDF: HPIntelMSREvtDriverContextCleanup\n"));
 
     //
     // Stop WPP Tracing
     //
     WPP_CLEANUP(WdfDriverWdmGetDriverObject((WDFDRIVER)DriverObject));
 }
-
-
-

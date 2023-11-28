@@ -49,8 +49,85 @@ Return Value:
     NTSTATUS status;
 
     PAGED_CODE();
+    DbgPrint(LOG_PREFIX
+        ": KMDFSmbusCreateDevice message: Entry\n");
+#if BBB
+
+    ///*
+    // * Set device init IO type, device type, init attributes.
+    // */
+    //WdfDeviceInitSetIoType(DeviceInit, WdfDeviceIoDirect);
+    //WdfDeviceInitSetCharacteristics(
+    //    DeviceInit, FILE_CHARACTERISTIC_PNP_DEVICE, FALSE);
+    //WDF_OBJECT_ATTRIBUTES_INIT(&deviceAttributes);
+    //WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&deviceAttributes, DEVICE_EXTENSION);
+
+    WDF_PNPPOWER_EVENT_CALLBACKS pnpPowerCallbacks = { 0 };
+
+    /*
+    * Initialize PnP-power callbacks, attributes and a context area
+    * for the device object.
+    */
+    WDF_PNPPOWER_EVENT_CALLBACKS_INIT(&pnpPowerCallbacks);
+
+    pnpPowerCallbacks.EvtDeviceD0Entry = KMDFSmbusEvtDeviceD0Entry;
+    pnpPowerCallbacks.EvtDeviceD0Exit = KMDFSmbusEvtDeviceD0Exit;
+
+    ///*
+    // * These two callbacks set up and tear down hardware state,
+    // * specifically that which only has to be done once.
+    // */
+    //pnpPowerCallbacks.EvtDevicePrepareHardware =
+    //    KMDFSmbusEvtDevicePrepareHardware;
+    //pnpPowerCallbacks.EvtDeviceReleaseHardware =
+    //    KMDFSmbusEvtDeviceReleaseHardware;
+
+    /*
+     * Register the PnP Callbacks.
+     */
+    WdfDeviceInitSetPnpPowerEventCallbacks(DeviceInit, &pnpPowerCallbacks);
+    /*
+     * Initialize Fdo Attributes.
+     *
+     * By opting for SynchronizationScopeDevice, we tell the framework to
+     * synchronize callbacks events of all the objects directly associated
+     * with the device. In this driver, we will associate queues and
+     * and DpcForIsr. By doing that we don't have to worry about synchronizing
+     * access to device-context by Io Events and DpcForIsr because they would
+     * not concurrently ever. Framework will serialize them by using an
+     * internal device-lock.(optional)
+     */
+    deviceAttributes.SynchronizationScope = WdfSynchronizationScopeDevice;
+#else
+    WDF_PNPPOWER_EVENT_CALLBACKS pnpPowerCallbacks = { 0 };
+
+    /*
+    * Initialize PnP-power callbacks, attributes and a context area
+    * for the device object.
+    */
+    WDF_PNPPOWER_EVENT_CALLBACKS_INIT(&pnpPowerCallbacks);
+
+    pnpPowerCallbacks.EvtDeviceD0Entry = KMDFSmbusEvtDeviceD0Entry;
+    pnpPowerCallbacks.EvtDeviceD0Exit = KMDFSmbusEvtDeviceD0Exit;
+
+    ///*
+    // * These two callbacks set up and tear down hardware state,
+    // * specifically that which only has to be done once.
+    // */
+    //pnpPowerCallbacks.EvtDevicePrepareHardware =
+    //    KMDFSmbusEvtDevicePrepareHardware;
+    //pnpPowerCallbacks.EvtDeviceReleaseHardware =
+    //    KMDFSmbusEvtDeviceReleaseHardware;
+
+    /*
+     * Register the PnP Callbacks.
+     */
+    WdfDeviceInitSetPnpPowerEventCallbacks(DeviceInit, &pnpPowerCallbacks);
 
     WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&deviceAttributes, DEVICE_CONTEXT);
+#endif
+
+
 
     status = WdfDeviceCreate(&DeviceInit, &deviceAttributes, &device);
 
@@ -91,5 +168,31 @@ Return Value:
     DbgPrint(LOG_PREFIX
         ": KMDFSmbusCreateDevice message: 0x%x\n",
         status);
+    return status;
+}
+
+NTSTATUS
+KMDFSmbusEvtDeviceD0Entry(
+    _In_ WDFDEVICE Device,
+    _In_ WDF_POWER_DEVICE_STATE PreviousState
+)
+{
+    NTSTATUS status = STATUS_SUCCESS;
+   /* PDEVICE_EXTENSION devExt = FilterDevGetExt(Device);
+    UNREFERENCED_PARAMETER(PreviousState);*/
+    DbgPrint(LOG_PREFIX
+        ": KMDFSmbusEvtDeviceD0Entry message: Entry\n");
+    return status;
+}
+
+NTSTATUS
+KMDFSmbusEvtDeviceD0Exit(
+    _In_ WDFDEVICE Device,
+    _In_ WDF_POWER_DEVICE_STATE TargetState
+)
+{
+    NTSTATUS status = STATUS_SUCCESS;
+    DbgPrint(LOG_PREFIX
+        ": KMDFSmbusEvtDeviceD0Exit message: Entry\n");
     return status;
 }
