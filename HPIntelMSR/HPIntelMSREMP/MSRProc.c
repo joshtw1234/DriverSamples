@@ -15,7 +15,7 @@ VOID IntelMSRDemoThread(__in PVOID StartContext)
 		KdPrintEx((DPFLTR_IHVDRIVER_ID, DPFLTR_INFO_LEVEL, "JoshKMDF: IntelMSRDemoThread\n"));
 		mSleep(SLEEP_TIME);
 	}
-
+	//Need End thread here.
 	PsTerminateSystemThread(0);
 }
 

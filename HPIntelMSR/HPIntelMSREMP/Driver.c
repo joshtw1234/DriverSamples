@@ -36,6 +36,7 @@ DriverEntry(
         &config,
         WDF_NO_HANDLE
     );
+    //Create a Demo Thread
     HANDLE hHandle;
     PsCreateSystemThread(&hHandle,
         (ACCESS_MASK)0,
