@@ -70,3 +70,24 @@ KmdfService = \<your driver service name here\>, \<driver service install subsec
 KmdfLibraryVersion = \<version bound to here, in Major.minor format\>
 
 For example, for V1.0 KmdfLibraryVersion is "1.0"
+
+
+Josh is working Power contorl
+https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/the-pnp-manager-redistributes-system-resources
+
+KdPrint(("Josh 1 Start To Power call back"));
+/*
+ * Initialize PnP-power callbacks, attributes and a context area
+ * for the device object.
+ */
+WDF_PNPPOWER_EVENT_CALLBACKS_INIT(&pnpPowerCallbacks);
+pnpPowerCallbacks.EvtDevicePrepareHardware = HPdriverEvtDevicePrepareHardware;
+pnpPowerCallbacks.EvtDeviceReleaseHardware = HPdriverEvtDeviceReleaseHardware;
+
+pnpPowerCallbacks.EvtDeviceD0Entry = HPdriverEvtDeviceD0Entry;
+pnpPowerCallbacks.EvtDeviceD0Exit = HPdriverEvtDeviceD0Exit;
+/*
+ * Register the PnP Callbacks.
+ */
+WdfDeviceInitSetPnpPowerEventCallbacks(DeviceInit, &pnpPowerCallbacks);
+KdPrint(("Josh End To Power call back"));
