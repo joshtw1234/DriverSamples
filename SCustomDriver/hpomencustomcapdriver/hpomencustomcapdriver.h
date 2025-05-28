@@ -90,6 +90,14 @@ HPCustCapWmiRegistration(
     );
 
 //
+// Windows Power Events callbacks
+//
+EVT_WDF_DEVICE_D0_ENTRY HPDriverEvtDeviceD0Entry;
+EVT_WDF_DEVICE_D0_EXIT HPDriverEvtDeviceD0Exit;
+EVT_WDF_DEVICE_PREPARE_HARDWARE HPDriverEvtDevicePrepareHardware;
+EVT_WDF_DEVICE_RELEASE_HARDWARE HPDriverEvtDeviceReleaseHardware;
+
+//
 // Power events callbacks
 //
 EVT_WDF_DEVICE_ARM_WAKE_FROM_S0 HPCustCapEvtDeviceArmWakeFromS0;

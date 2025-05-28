@@ -117,12 +117,28 @@ Return Value:
     WDF_OBJECT_ATTRIBUTES  fdoAttributes;
     WDFDEVICE              hDevice;
     WDFQUEUE               queue;
-
+    WDF_PNPPOWER_EVENT_CALLBACKS pnpPowerCallbacks = { 0 };
     UNREFERENCED_PARAMETER(Driver);
 
     PAGED_CODE();
 
     KdPrint(("Josh HPCustCapEvtDeviceAdd called\n"));
+
+    KdPrint(("Josh 1 Start To Power call back"));
+    /*
+     * Initialize PnP-power callbacks, attributes and a context area
+     * for the device object.
+     */
+    WDF_PNPPOWER_EVENT_CALLBACKS_INIT(&pnpPowerCallbacks);
+    pnpPowerCallbacks.EvtDevicePrepareHardware = HPDriverEvtDevicePrepareHardware;
+    pnpPowerCallbacks.EvtDeviceReleaseHardware = HPDriverEvtDeviceReleaseHardware;
+    pnpPowerCallbacks.EvtDeviceD0Entry = HPDriverEvtDeviceD0Entry;
+    pnpPowerCallbacks.EvtDeviceD0Exit = HPDriverEvtDeviceD0Exit;
+    /*
+     * Register the PnP Callbacks.
+     */
+    WdfDeviceInitSetPnpPowerEventCallbacks(DeviceInit, &pnpPowerCallbacks);
+    KdPrint(("Josh End To Power call back"));
 
     //
     // Initialize attributes and a context area for the device object.
@@ -214,6 +230,89 @@ Return Value:
 
     return status;
 }
+/**
+ * @brief Routine Description:
+ * Performs whatever initialization is needed to setup the device, setting up
+ * a DMA channel or mapping any I/O port resources.  This will only be called
+ * as a device starts or restarts, not every time the device moves into the D0
+ * state.  Consequently, most hardware initialization belongs elsewhere.
+ *
+ * @param Device - A handle to the WDFDEVICE
+ * @param Resources - The raw PnP resources associated with the device.
+ * Most of the time, these aren't useful for a PCI device.
+ * @param ResourcesTranslated - The translated PnP resources associated with
+ * the device.  This is what is important to a PCI device.
+ *
+ * @return NT status code - failure will result in the device stack being
+ * torn down
+ */
+NTSTATUS
+HPDriverEvtDevicePrepareHardware(WDFDEVICE Device, WDFCMRESLIST Resources,
+    WDFCMRESLIST ResourcesTranslated)
+{
+    UNREFERENCED_PARAMETER(Resources);
+    UNREFERENCED_PARAMETER(ResourcesTranslated);
+    PAGED_CODE();
+    KdPrint(("Josh HPDriverEvtDevicePrepareHardware... \n"));
+    return STATUS_SUCCESS;
+}
+/**
+ * @brief Routine Description:
+ * Unmap the resources that were mapped in PLxEvtDevicePrepareHardware.
+ * This will only be called when the device stopped for resource rebalance,
+ * surprise-removed or query-removed.
+ *
+ * @param Device - A handle to the WDFDEVICE
+ * @param ResourcesTranslated - The translated PnP resources associated with the
+ * device.  This is what is important to a PCI device.
+ *
+ * @Return Value:
+ * NT status code - failure will result in the device stack being torn down
+ *
+ */
+NTSTATUS
+HPDriverEvtDeviceReleaseHardware(IN WDFDEVICE Device,
+    IN WDFCMRESLIST ResourcesTranslated)
+{
+    UNREFERENCED_PARAMETER(ResourcesTranslated);
+    PAGED_CODE();
+    KdPrint(("Josh HPDriverEvtDeviceReleaseHardware... \n"));
+    return STATUS_SUCCESS;
+}
+/**
+ * @brief Used to configure device on D0 entry
+ *
+ * @param dev WDF device
+ * @param previousState previous power state
+ *
+ * @return On success, the function returns STATUS_SUCCESS
+ * On failure it passes the relevant error code to the caller.
+ */
+NTSTATUS
+HPDriverEvtDeviceD0Entry(IN WDFDEVICE Device,
+    IN WDF_POWER_DEVICE_STATE PreviousState)
+{
+    KdPrint(("Josh HPDriverEvtDeviceD0Entry... \n"));
+    return STATUS_SUCCESS;
+}
+/**
+ * @brief Used to configure device on D0 exit
+ *
+ * @param Device WDF device
+ * @param TargetState Target power state
+ *
+ * @return On success, the function returns STATUS_SUCCESS
+ * On failure it passes the relevant error code to the caller.
+ */
+NTSTATUS
+HPDriverEvtDeviceD0Exit(IN WDFDEVICE Device,
+    IN WDF_POWER_DEVICE_STATE TargetState)
+{
+    PAGED_CODE();
+    KdPrint(("Josh HPDriverEvtDeviceD0Exit... \n"));
+    return STATUS_SUCCESS;
+}
+
 
 VOID
 HPCustCapEvtIoRead (
