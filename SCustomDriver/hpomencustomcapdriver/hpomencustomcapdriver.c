@@ -50,7 +50,7 @@ Return Value:
     NTSTATUS            status = STATUS_SUCCESS;
     WDF_DRIVER_CONFIG   config;
 
-    KdPrint(("HP Custom Capability - Driver Entry.\n"));
+    KdPrint(("Josh HP Custom Capability - Driver Entry.\n"));
 
     //
     // Initiialize driver config to control the attributes that

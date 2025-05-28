@@ -28,7 +28,8 @@ hpomencustomcapdriver.sys = 1,,
 %ManufacturerName% = Standard,NT$ARCH$.10.0...16299 ; %13% support introduced in build 16299
 
 [Standard.NT$ARCH$.10.0...16299]
-%hpomencustomcapdriver.DeviceDesc% = hpomencustomcapdriver_Device, Root\hpomencustomcapdriver ; TODO: edit hw-id
+;%hpomencustomcapdriver.DeviceDesc% = hpomencustomcapdriver_Device, Root\JoshDriver ; TODO: edit hw-id
+%hpomencustomcapdriver.DeviceDesc% = hpomencustomcapdriver_Device, Root\JoshDriver
 
 [hpomencustomcapdriver_Device.NT]
 CopyFiles = File_Copy
@@ -38,7 +39,8 @@ hpomencustomcapdriver.sys
 
 ;-------------- Service installation
 [hpomencustomcapdriver_Device.NT.Services]
-AddService = hpomencustomcapdriver,%SPSVCINST_ASSOCSERVICE%, hpomencustomcapdriver_Service_Inst
+;AddService = hpomencustomcapdriver,%SPSVCINST_ASSOCSERVICE%, hpomencustomcapdriver_Service_Inst
+AddService = HPOmenCustomCapDriver, 0x00000002, hpomencustomcapdriver_Service_Inst, 
 
 ; -------------- hpomencustomcapdriver driver install sections
 [hpomencustomcapdriver_Service_Inst]
@@ -55,8 +57,37 @@ KmdfService = hpomencustomcapdriver, hpomencustomcapdriver_wdfsect
 KmdfLibraryVersion = $KMDFVERSION$
 
 [Strings]
-SPSVCINST_ASSOCSERVICE = 0x00000002
-ManufacturerName = "<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+;SPSVCINST_ASSOCSERVICE = 0x00000002
+ManufacturerName = "Josh"
 DiskName = "hpomencustomcapdriver Installation Disk"
-hpomencustomcapdriver.DeviceDesc = "hpomencustomcapdriver Device"
-hpomencustomcapdriver.SVCDESC = "hpomencustomcapdriver Service"
+;DiskId = "Install disk (1)"
+hpomencustomcapdriver.DeviceDesc = "Josh Device"
+hpomencustomcapdriver.SVCDESC = "Josh Service"
+
+
+;
+; The "standard" defines
+;
+REG_EXPAND_SZ = 0x00020000
+REG_DWORD = 0x00010001
+SERVICE_BOOT_START = 0x00000000
+SERVICE_SYSTEM_START = 0x00000001
+SERVICE_AUTO_START = 0x00000002
+SERVICE_DEMAND_START = 0x00000003
+SERVICE_DISABLED = 0x00000004
+SERVICE_ERROR_IGNORE = 0x00000000
+SERVICE_ERROR_NORMAL = 0x00000001
+SERVICE_ERROR_SEVERE = 0x00000002
+SERVICE_ERROR_CRITICAL = 0x00000003
+COPYFLG_WARN_IF_SKIP = 0x00000001
+COPYFLG_NOSKIP = 0x00000002
+COPYFLG_NOVERSIONCHECK = 0x00000004
+COPYFLG_FORCE_FILE_IN_USE = 0x00000008
+COPYFLG_NO_OVERWRITE = 0x00000010
+COPYFLG_NO_VERSION_DIALOG = 0x00000020
+COPYFLG_OVERWRITE_OLDER_ONLY = 0x00000040
+COPYFLG_REPLACEONLY = 0x00000400
+COPYFLG_NODECOMP = 0x00000800
+COPYFLG_REPLACE_BOOT_FILE = 0x00001000
+COPYFLG_NOPRUNE = 0x00002000
+COPYFLG_IN_USE_RENAME = 0x00004000
