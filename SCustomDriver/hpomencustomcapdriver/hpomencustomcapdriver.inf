@@ -4,8 +4,8 @@
 
 [Version]
 Signature   = "$WINDOWS NT$"
-Class       = System ; TODO: specify appropriate Class
-ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
+Class       = System
+ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318}
 Provider    = %ManufacturerName%
 CatalogFile = hpomencustomcapdriver.cat
 DriverVer   = ; TODO: set DriverVer in stampinf property pages
@@ -29,7 +29,7 @@ hpomencustomcapdriver.sys = 1,,
 
 [Standard.NT$ARCH$.10.0...16299]
 ;%hpomencustomcapdriver.DeviceDesc% = hpomencustomcapdriver_Device, Root\JoshDriver ; TODO: edit hw-id
-%hpomencustomcapdriver.DeviceDesc% = hpomencustomcapdriver_Device, Root\JoshDriver
+%hpomencustomcapdriver.DeviceDesc% = hpomencustomcapdriver_Device, ACPI\HPIC0004
 
 [hpomencustomcapdriver_Device.NT]
 CopyFiles = File_Copy
@@ -58,7 +58,7 @@ KmdfLibraryVersion = $KMDFVERSION$
 
 [Strings]
 ;SPSVCINST_ASSOCSERVICE = 0x00000002
-ManufacturerName = "Josh"
+ManufacturerName = "Josh Inc."
 DiskName = "hpomencustomcapdriver Installation Disk"
 ;DiskId = "Install disk (1)"
 hpomencustomcapdriver.DeviceDesc = "Josh Device"

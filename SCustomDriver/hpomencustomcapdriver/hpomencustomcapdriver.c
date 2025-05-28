@@ -122,7 +122,7 @@ Return Value:
 
     PAGED_CODE();
 
-    KdPrint(("HPCustCapEvtDeviceAdd called\n"));
+    KdPrint(("Josh HPCustCapEvtDeviceAdd called\n"));
 
     //
     // Initialize attributes and a context area for the device object.
