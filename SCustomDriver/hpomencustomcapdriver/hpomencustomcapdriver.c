@@ -292,7 +292,7 @@ NTSTATUS
 HPDriverEvtDeviceD0Entry(IN WDFDEVICE Device,
     IN WDF_POWER_DEVICE_STATE PreviousState)
 {
-    KdPrint(("Josh HPDriverEvtDeviceD0Entry... \n"));
+    KdPrint(("Josh HPDriverEvtDeviceD0Entry... %d\n", PreviousState));
     return STATUS_SUCCESS;
 }
 /**
@@ -309,7 +309,7 @@ HPDriverEvtDeviceD0Exit(IN WDFDEVICE Device,
     IN WDF_POWER_DEVICE_STATE TargetState)
 {
     PAGED_CODE();
-    KdPrint(("Josh HPDriverEvtDeviceD0Exit... \n"));
+    KdPrint(("Josh HPDriverEvtDeviceD0Exit... %d \n", TargetState));
     return STATUS_SUCCESS;
 }
 
