@@ -94,6 +94,7 @@ HPCustCapWmiRegistration(
 //
 EVT_WDF_DEVICE_D0_ENTRY HPDriverEvtDeviceD0Entry;
 EVT_WDF_DEVICE_D0_EXIT HPDriverEvtDeviceD0Exit;
+EVT_WDF_DEVICE_SELF_MANAGED_IO_SUSPEND HPDriver_EvtDeviceSelfManagedIoSuspend;
 EVT_WDF_DEVICE_PREPARE_HARDWARE HPDriverEvtDevicePrepareHardware;
 EVT_WDF_DEVICE_RELEASE_HARDWARE HPDriverEvtDeviceReleaseHardware;
 

@@ -132,6 +132,7 @@ Return Value:
     WDF_PNPPOWER_EVENT_CALLBACKS_INIT(&pnpPowerCallbacks);
     pnpPowerCallbacks.EvtDevicePrepareHardware = HPDriverEvtDevicePrepareHardware;
     pnpPowerCallbacks.EvtDeviceReleaseHardware = HPDriverEvtDeviceReleaseHardware;
+    pnpPowerCallbacks.EvtDeviceSelfManagedIoSuspend = HPDriver_EvtDeviceSelfManagedIoSuspend;
     pnpPowerCallbacks.EvtDeviceD0Entry = HPDriverEvtDeviceD0Entry;
     pnpPowerCallbacks.EvtDeviceD0Exit = HPDriverEvtDeviceD0Exit;
     /*
@@ -277,6 +278,12 @@ HPDriverEvtDeviceReleaseHardware(IN WDFDEVICE Device,
     UNREFERENCED_PARAMETER(ResourcesTranslated);
     PAGED_CODE();
     KdPrint(("Josh HPDriverEvtDeviceReleaseHardware... \n"));
+    return STATUS_SUCCESS;
+}
+NTSTATUS HPDriver_EvtDeviceSelfManagedIoSuspend(IN WDFDEVICE Device)
+{
+    UNREFERENCED_PARAMETER(Device);
+    KdPrint(("Josh HPDriver_EvtDeviceSelfManagedIoSuspend... \n"));
     return STATUS_SUCCESS;
 }
 /**
