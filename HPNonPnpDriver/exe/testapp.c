@@ -238,7 +238,24 @@ main(
             return;
         }
     }
-
+#if TRUE
+    //
+  // open the device
+  //
+    hDevice = CreateFile(DEVICE_NAME,
+              GENERIC_READ | GENERIC_WRITE,
+              0,
+              NULL,
+              CREATE_ALWAYS,
+              FILE_ATTRIBUTE_NORMAL,
+              NULL);
+    if (hDevice == INVALID_HANDLE_VALUE)
+    {
+        printf("Josh INVALID_HANDLE_VALUE\n");
+        return;
+    }
+    DoJoshIoctls(hDevice);
+#else
     if (!G_versionSpecified ) {
         coinstallerVersion = GetCoinstallerVersion();
 
@@ -361,6 +378,7 @@ main(
     if ( library ) {
         UnloadWdfCoInstaller( library );
     }
+#endif
     return;
 }
 
