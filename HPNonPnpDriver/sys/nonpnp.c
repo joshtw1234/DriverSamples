@@ -226,9 +226,9 @@ Return Value:
     WdfControlDeviceInitSetShutdownNotification(DeviceInit,
                                                 NonPnpShutdown,
                                                 WdfDeviceShutdown);
-    WdfControlDeviceInitSetShutdownNotification(DeviceInit,
+    /*WdfControlDeviceInitSetShutdownNotification(DeviceInit,
                                                 NonPnpShutdownG,
-                                                WdfDeviceLastChanceShutdown);
+                                                WdfDeviceLastChanceShutdown);*/
 
     //
     // Initialize WDF_FILEOBJECT_CONFIG_INIT struct to tell the

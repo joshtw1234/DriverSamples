@@ -26,7 +26,7 @@ xcopy $PARAM ..\sys\x64\$DebugROOT\HPNonPnpDriver\*.sys .
 xcopy $PARAM ..\exe\x64\$DebugROOT\*.pdb .
 xcopy $PARAM ..\sys\x64\$DebugROOT\*.pdb .
 xcopy $PARAM "C:\Program Files (x86)\Windows Kits\8.0\redist\wdf\x64\WdfCoInstaller01011.dll" .
-xcopy $PARAM ..\exe\x64\$DebugROOT\*.inf .
+xcopy $PARAM ..\exe\*.inf
 
 xcopy $PARAM . \\$RemotIP\$RROOT\HPDriver\z-HPNonPnpDriver\
 pause
