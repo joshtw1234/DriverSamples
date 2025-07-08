@@ -92,7 +92,7 @@
     </OtherWpp>
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>nonpnp</TargetName>
+    <TargetName>HPNonPnpDriver</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <TargetName>HPNonPnpDriver</TargetName>
@@ -112,6 +112,7 @@
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);..</AdditionalIncludeDirectories>
       <ExceptionHandling>
       </ExceptionHandling>
+      <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Midl>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);_WIN2K_COMPAT_SLIST_USAGE</PreprocessorDefinitions>
