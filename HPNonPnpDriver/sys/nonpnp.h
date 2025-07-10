@@ -89,5 +89,8 @@ PrintChars(
 NTSTATUS
 ReadMSRByID(ULONG id, ULONG* eax, ULONG* edx, BYTE* outBuffer);
 
+VOID
+TestEditRegistry();
+
 #pragma warning(disable:4127)
 

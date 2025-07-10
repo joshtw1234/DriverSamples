@@ -11,7 +11,7 @@ del "%WINDIR%\System32\Drivers\*HPNonPnpDriver*"
 
 xcopy /Y/D ".\HPNonPnpDriver.sys" "%WINDIR%\System32\Drivers\"
 
-sc create HPNonPnpDriver binpath= "%WINDIR%\System32\Drivers\HPNonPnpDriver.sys" type= kernel
+sc create HPNonPnpDriver binpath= "%WINDIR%\System32\Drivers\HPNonPnpDriver.sys" type= kernel start= auto
 sc start HPNonPnpDriver
 
 pause

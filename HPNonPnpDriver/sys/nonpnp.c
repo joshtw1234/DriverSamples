@@ -54,6 +54,7 @@ Environment:
 #pragma alloc_text( PAGE, FileEvtIoDeviceControl)
 #endif // ALLOC_PRAGMA
 
+#define PARAMATER_NAME_LEN 80
 
 NTSTATUS
 DriverEntry(
@@ -207,6 +208,36 @@ Return Value:
 
     TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT,
                    "NonPnpDeviceAdd DeviceInit %p\n", DeviceInit);
+
+    //PVOID objectToUse;
+    //objectToUse = Driver;
+    //PIO_ERROR_LOG_PACKET errorLogEntry;
+    //errorLogEntry = IoAllocateErrorLogEntry(objectToUse, (UCHAR)(sizeof(IO_ERROR_LOG_PACKET)) + (3 * sizeof(ULONG)));
+
+    //if (errorLogEntry != NULL) {
+
+    //    //errorLogEntry->ErrorCode = 0;
+    //    //errorLogEntry->SequenceNumber = 4321;
+    //    ////errorLogEntry->MajorFunctionCode = MajorFunctionCode;
+    //    //errorLogEntry->RetryCount = 1;
+    //    //errorLogEntry->UniqueErrorValue = UniqueErrorValue;
+    //    //errorLogEntry->FinalStatus = FinalStatus;
+    //    //errorLogEntry->DumpDataSize = dumpToAllocate;
+
+    //    errorLogEntry->FinalStatus = STATUS_SUCCESS;
+    //    errorLogEntry->ErrorCode = IO_WRN_FAILURE_PREDICTED;
+    //    errorLogEntry->SequenceNumber = 0;
+    //    errorLogEntry->MajorFunctionCode = IRP_MJ_DEVICE_CONTROL;
+    //    //errorLogEntry->IoControlCode = IOCTL_STORAGE_PREDICT_FAILURE;
+    //    errorLogEntry->RetryCount = 0;
+    //    //errorLogEntry->UniqueErrorValue = UniqueErrorValue;
+    //    errorLogEntry->DumpDataSize = 3;
+
+    //    /*errorLogEntry->DumpData[0] = PathId;
+    //    errorLogEntry->DumpData[1] = TargetId;
+    //    errorLogEntry->DumpData[2] = Lun;*/
+    //    IoWriteErrorLogEntry(errorLogEntry);
+    //}
     //
     // Set exclusive to TRUE so that no more than one app can talk to the
     // control device at any time.
@@ -396,6 +427,58 @@ Return Value:
 
 }
 
+VOID 
+TestEditRegistry() {
+    //Josh use this one => RtlCreateRegistryKey
+    ULONG revData = 0;
+    NTSTATUS           status;
+    RTL_QUERY_REGISTRY_TABLE qTable[2];
+    RtlZeroMemory(qTable, sizeof(qTable));
+    qTable[0].Flags = RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_REQUIRED | RTL_QUERY_REGISTRY_TYPECHECK;
+    qTable[0].Name = L"WatchDogStatus";
+    qTable[0].EntryContext = &revData;
+    qTable[0].DefaultType = (REG_DWORD << RTL_QUERY_REGISTRY_TYPECHECK_SHIFT) | REG_NONE;
+
+
+    status = RtlQueryRegistryValues(
+        RTL_REGISTRY_ABSOLUTE,
+        L"\\Registry\\Machine\\Software\\HP\\OMEN Ally\\WatchDog",
+        qTable, 
+        L"\\Registry\\Machine\\Software\\HP\\OMEN Ally\\WatchDog",
+        NULL);
+
+    KdPrint(("Josh Reg 121 === %d == %d === %d\n", status, qTable[0].DefaultType, revData));
+    switch (qTable[0].DefaultType)
+    {
+    case REG_DWORD:
+        KdPrint(("Josh Reg 131 REG_DWORD\n"));
+        break;
+    case REG_BINARY:
+        KdPrint(("Josh Reg 131 REG_BINARY\n"));
+        break;
+    case REG_QWORD:
+        KdPrint(("Josh Reg 131 REG_QWORD\n"));
+        break;
+    case REG_MULTI_SZ:
+        KdPrint(("Josh Reg 131 REG_MULTI_SZ\n"));
+        break;
+    default:
+        KdPrint(("Josh Reg 131 UNKNOW\n"));
+        break;
+    }
+    ULONG sData = 1;
+    status = RtlWriteRegistryValue(
+        RTL_REGISTRY_ABSOLUTE,
+        L"\\Registry\\Machine\\Software\\HP\\OMEN Ally\\WatchDog",
+        L"WatchDogStatus",
+        REG_DWORD,
+        &sData,
+        sizeof(ULONG));
+
+    KdPrint(("Josh Reg 131 === %d\n", status));
+
+    return;
+}
 
 
 VOID
@@ -1319,6 +1402,7 @@ Return Value:
 {
     UNREFERENCED_PARAMETER(Device);
     KdPrint(("Josh NonPnpShutdown"));
+    TestEditRegistry();
     return;
 }
 
@@ -1352,6 +1436,7 @@ Return Value:
 {
     UNREFERENCED_PARAMETER(Device);
     KdPrint(("Josh NonPnpShutdownG"));
+    TestEditRegistry();
     return;
 }
 
