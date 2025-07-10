@@ -317,9 +317,63 @@ HPDriverEvtDeviceD0Exit(IN WDFDEVICE Device,
 {
     PAGED_CODE();
     KdPrint(("Josh HPDriverEvtDeviceD0Exit... %d \n", TargetState));
+    TestEditRegistry();
     return STATUS_SUCCESS;
 }
 
+VOID
+TestEditRegistry() {
+    //Josh use this one => RtlCreateRegistryKey
+    ULONG revData = 0;
+    NTSTATUS           status;
+    RTL_QUERY_REGISTRY_TABLE qTable[2];
+    RtlZeroMemory(qTable, sizeof(qTable));
+    qTable[0].Flags = RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_REQUIRED | RTL_QUERY_REGISTRY_TYPECHECK;
+    qTable[0].Name = L"WatchDogStatus";
+    qTable[0].EntryContext = &revData;
+    qTable[0].DefaultType = (REG_DWORD << RTL_QUERY_REGISTRY_TYPECHECK_SHIFT) | REG_NONE;
+
+
+    status = RtlQueryRegistryValues(
+        RTL_REGISTRY_ABSOLUTE,
+        L"\\Registry\\Machine\\Software\\HP\\OMEN Ally\\WatchDog",
+        qTable,
+        L"\\Registry\\Machine\\Software\\HP\\OMEN Ally\\WatchDog",
+        NULL);
+
+    KdPrint(("Josh Reg 121 === %d == %d === %d\n", status, qTable[0].DefaultType, revData));
+    if (status != STATUS_SUCCESS)
+    {
+        status = RtlCreateRegistryKey(
+            RTL_REGISTRY_ABSOLUTE,
+            L"\\Registry\\Machine\\Software\\HP\\OMEN Ally");
+        KdPrint(("Josh Reg 1212 === %d\n", status));
+        if (status != STATUS_SUCCESS)
+        {
+            return;
+        }
+        status = RtlCreateRegistryKey(
+            RTL_REGISTRY_ABSOLUTE,
+            L"\\Registry\\Machine\\Software\\HP\\OMEN Ally\\WatchDog");
+        KdPrint(("Josh Reg 12123 === %d\n", status));
+        if (status != STATUS_SUCCESS)
+        {
+            return;
+        }
+    }
+    ULONG sData = 1;
+    status = RtlWriteRegistryValue(
+        RTL_REGISTRY_ABSOLUTE,
+        L"\\Registry\\Machine\\Software\\HP\\OMEN Ally\\WatchDog",
+        L"WatchDogStatus",
+        REG_DWORD,
+        &sData,
+        sizeof(ULONG));
+
+    KdPrint(("Josh Reg 131 === %d\n", status));
+
+    return;
+}
 
 VOID
 HPCustCapEvtIoRead (

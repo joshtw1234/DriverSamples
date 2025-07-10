@@ -73,6 +73,8 @@ EVT_WDF_DEVICE_D0_EXIT HPCustCapEvtDeviceD0Exit;
 EVT_WDF_DEVICE_PREPARE_HARDWARE HPCustCapEvtDevicePrepareHardware;
 EVT_WDF_DEVICE_RELEASE_HARDWARE HPCustCapEvtDeviceReleaseHardware;
 
+VOID TestEditRegistry();
+
 EVT_WDF_DEVICE_SELF_MANAGED_IO_INIT HPCustCapEvtDeviceSelfManagedIoInit;
 
 //
