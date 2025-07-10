@@ -448,23 +448,24 @@ TestEditRegistry() {
         NULL);
 
     KdPrint(("Josh Reg 121 === %d == %d === %d\n", status, qTable[0].DefaultType, revData));
-    switch (qTable[0].DefaultType)
+    if (status != STATUS_SUCCESS)
     {
-    case REG_DWORD:
-        KdPrint(("Josh Reg 131 REG_DWORD\n"));
-        break;
-    case REG_BINARY:
-        KdPrint(("Josh Reg 131 REG_BINARY\n"));
-        break;
-    case REG_QWORD:
-        KdPrint(("Josh Reg 131 REG_QWORD\n"));
-        break;
-    case REG_MULTI_SZ:
-        KdPrint(("Josh Reg 131 REG_MULTI_SZ\n"));
-        break;
-    default:
-        KdPrint(("Josh Reg 131 UNKNOW\n"));
-        break;
+        status = RtlCreateRegistryKey(
+            RTL_REGISTRY_ABSOLUTE,
+            L"\\Registry\\Machine\\Software\\HP\\OMEN Ally");
+        KdPrint(("Josh Reg 1212 === %d\n", status));
+        if (status != STATUS_SUCCESS)
+        {
+            return;
+        }
+        status = RtlCreateRegistryKey(
+            RTL_REGISTRY_ABSOLUTE,
+            L"\\Registry\\Machine\\Software\\HP\\OMEN Ally\\WatchDog");
+        KdPrint(("Josh Reg 12123 === %d\n", status));
+        if (status != STATUS_SUCCESS)
+        {
+            return;
+        }
     }
     ULONG sData = 1;
     status = RtlWriteRegistryValue(
