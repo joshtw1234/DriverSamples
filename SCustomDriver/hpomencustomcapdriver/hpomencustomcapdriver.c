@@ -50,7 +50,7 @@ Return Value:
     NTSTATUS            status = STATUS_SUCCESS;
     WDF_DRIVER_CONFIG   config;
 
-    KdPrint(("Josh HP Custom Capability - Driver Entry.\n"));
+    KdPrint(("Josh HP Custom Capability - Driver Entry + IOCTRL.\n"));
 
     //
     // Initiialize driver config to control the attributes that
@@ -82,6 +82,10 @@ Return Value:
     if (!NT_SUCCESS(status)) {
         KdPrint( ("WdfDriverCreate failed with status 0x%x\n", status));
     }
+    //// use IRP method
+    //DriverObject->MajorFunction[IRP_MJ_CREATE] = Dispatcher;
+    //DriverObject->MajorFunction[IRP_MJ_CLOSE] = Dispatcher;
+    //DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = Dispatcher;
 
     return status;
 }
@@ -130,11 +134,12 @@ Return Value:
      * for the device object.
      */
     WDF_PNPPOWER_EVENT_CALLBACKS_INIT(&pnpPowerCallbacks);
+    //The Call method order of Power control
     pnpPowerCallbacks.EvtDevicePrepareHardware = HPDriverEvtDevicePrepareHardware;
-    pnpPowerCallbacks.EvtDeviceReleaseHardware = HPDriverEvtDeviceReleaseHardware;
-    pnpPowerCallbacks.EvtDeviceSelfManagedIoSuspend = HPDriver_EvtDeviceSelfManagedIoSuspend;
     pnpPowerCallbacks.EvtDeviceD0Entry = HPDriverEvtDeviceD0Entry;
+    pnpPowerCallbacks.EvtDeviceSelfManagedIoSuspend = HPDriver_EvtDeviceSelfManagedIoSuspend;
     pnpPowerCallbacks.EvtDeviceD0Exit = HPDriverEvtDeviceD0Exit;
+    pnpPowerCallbacks.EvtDeviceReleaseHardware = HPDriverEvtDeviceReleaseHardware;
     /*
      * Register the PnP Callbacks.
      */
@@ -530,28 +535,57 @@ Return Value:
 --*/
 {
     NTSTATUS  status= STATUS_SUCCESS;
+    PVOID               inBuf = NULL; // pointer to Input and output buffer
+    PVOID               outBuf = NULL; // pointer to Input and output buffer
+    ULONGLONG           data = 0;
+    ULONG               datalen = (ULONG)sizeof(data);
+    size_t              bufSize;
 
     UNREFERENCED_PARAMETER(Queue);
-    UNREFERENCED_PARAMETER(OutputBufferLength);
-    UNREFERENCED_PARAMETER(InputBufferLength);
+    //UNREFERENCED_PARAMETER(OutputBufferLength);
+    //UNREFERENCED_PARAMETER(InputBufferLength);
 
     KdPrint(("HPCustCapEvtIoDeviceControl called\n"));
 
     PAGED_CODE();
-
+    KdPrint(("HPCustCapEvtIoDeviceControl IOCTL_NONPNP_METHOD_BUFFERED called\n"));
     //
     // Use WdfRequestRetrieveInputBuffer and WdfRequestRetrieveOutputBuffer
     // to get the request buffers.
     //
 
     switch (IoControlCode) {
-
+    case IOCTL_NONPNP_METHOD_BUFFERED:
+        KdPrint(("HPCustCapEvtIoDeviceControl IOCTL_NONPNP_METHOD_BUFFERED called\n"));
+        status = WdfRequestRetrieveInputBuffer(Request, 0, &inBuf, &bufSize);
+        if (!NT_SUCCESS(status)) {
+            status = STATUS_INSUFFICIENT_RESOURCES;
+            break;
+        }
+        ASSERT(bufSize == InputBufferLength);
+        status = WdfRequestRetrieveOutputBuffer(Request, 0, &outBuf, &bufSize);
+        if (!NT_SUCCESS(status)) {
+            status = STATUS_INSUFFICIENT_RESOURCES;
+            break;
+        }
+        ASSERT(bufSize == OutputBufferLength);
+        data = 999;
+        RtlCopyMemory(outBuf, &data, OutputBufferLength);
+        //
+        // Assign the length of the data copied to IoStatus.Information
+        // of the request and complete the request.
+        //
+        WdfRequestSetInformation(Request,
+            OutputBufferLength < datalen ? OutputBufferLength : datalen);
+        break;
     default:
         status = STATUS_INVALID_DEVICE_REQUEST;
+        break;
     }
 
     //
     // Complete the Request.
     //
-    WdfRequestCompleteWithInformation(Request, status, (ULONG_PTR) 0);
+    //WdfRequestCompleteWithInformation(Request, status, (ULONG_PTR) 0);
+    WdfRequestComplete(Request, status);
 }
