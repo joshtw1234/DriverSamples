@@ -15,7 +15,7 @@
 
 #define NTSTRSAFE_LIB
 #include <ntstrsafe.h>
-
+#include <wdmsec.h> // for SDDLs
 #include "wmilib.h"
 #include <initguid.h>
 #include "driver.h"
@@ -36,7 +36,7 @@
 //
 typedef struct _FDO_DATA
 {
-
+    HANDLE   FileHandle;
     WDFWMIINSTANCE WmiDeviceArrivalEvent;
 
     BOOLEAN     WmiPowerDeviceEnableRegistered;
@@ -86,10 +86,13 @@ EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL HPCustCapEvtIoDeviceControl;
 EVT_WDF_DEVICE_FILE_CREATE HPCustCapEvtDeviceFileCreate;
 EVT_WDF_FILE_CLOSE HPCustCapEvtFileClose;
 
+
 NTSTATUS
 HPCustCapWmiRegistration(
     _In_ WDFDEVICE Device
     );
+
+EVT_WDF_DEVICE_SHUTDOWN_NOTIFICATION NonPnpShutdown;
 
 //
 // Windows Power Events callbacks

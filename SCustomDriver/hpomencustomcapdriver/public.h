@@ -85,6 +85,9 @@ DEFINE_GUID(HPCUSTOMCAP_NOTIFY_DEVICE_ARRIVAL_EVENT,
 #define IOCTL_BUSENUM_UNPLUG_HARDWARE               BUSENUM_IOCTL (0x1)
 #define IOCTL_BUSENUM_EJECT_HARDWARE                BUSENUM_IOCTL (0x2)
 #define IOCTL_HPCUSTOMCAP_DONT_DISPLAY_IN_UI_DEVICE     BUSENUM_IOCTL (0x3)
+#define NTDEVICE_NAME_STRING      L"\\Device\\HPCustomDriver"
+#define SYMBOLIC_NAME_STRING     L"\\DosDevices\\HPCustomDriver"
+#define POOL_TAG                   'ELIF'
 //
 // Device type           -- in the "User Defined" range."
 //

@@ -17,6 +17,7 @@
 #endif
 
 
+
 NTSTATUS
 DriverEntry(
     IN PDRIVER_OBJECT  DriverObject,
@@ -49,8 +50,11 @@ Return Value:
 {
     NTSTATUS            status = STATUS_SUCCESS;
     WDF_DRIVER_CONFIG   config;
-
+    PWDFDEVICE_INIT pInit = NULL;
+    WDFDRIVER hDriver;
+    PWSTR revStr;
     KdPrint(("Josh HP Custom Capability - Driver Entry + IOCTRL.\n"));
+    KdPrint(("Josh HP Custom Capability - Path %wZ.\n", RegistryPath));
 
     //
     // Initiialize driver config to control the attributes that
@@ -76,9 +80,10 @@ Return Value:
         RegistryPath,
         WDF_NO_OBJECT_ATTRIBUTES, // Driver Attributes
         &config,          // Driver Config Info
-        WDF_NO_HANDLE
+        &hDriver
         );
-
+    //revStr = WdfDriverGetRegistryPath(DriverObject);
+    //KdPrint(("Josh WdfDriverCreate path %s\n", &revStr));
     if (!NT_SUCCESS(status)) {
         KdPrint( ("WdfDriverCreate failed with status 0x%x\n", status));
     }
@@ -86,6 +91,19 @@ Return Value:
     //DriverObject->MajorFunction[IRP_MJ_CREATE] = Dispatcher;
     //DriverObject->MajorFunction[IRP_MJ_CLOSE] = Dispatcher;
     //DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = Dispatcher;
+    //
+    //
+    // In order to create a control device, we first need to allocate a
+    // WDFDEVICE_INIT structure and set all properties.
+    //
+    pInit = WdfControlDeviceInitAllocate(
+                                        hDriver, 
+                                        &SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_RW_RES_R);
+
+    if (pInit == NULL) {
+        status = STATUS_INSUFFICIENT_RESOURCES;
+        return status;
+    }
 
     return status;
 }
@@ -122,6 +140,7 @@ Return Value:
     WDFDEVICE              hDevice;
     WDFQUEUE               queue;
     WDF_PNPPOWER_EVENT_CALLBACKS pnpPowerCallbacks = { 0 };
+    WDF_FILEOBJECT_CONFIG fileConfig;
     UNREFERENCED_PARAMETER(Driver);
 
     PAGED_CODE();
@@ -129,6 +148,11 @@ Return Value:
     KdPrint(("Josh HPCustCapEvtDeviceAdd called\n"));
 
     KdPrint(("Josh 1 Start To Power call back"));
+    DECLARE_CONST_UNICODE_STRING(ntDeviceName, NTDEVICE_NAME_STRING);
+    DECLARE_CONST_UNICODE_STRING(symbolicLinkName, SYMBOLIC_NAME_STRING);
+    WdfControlDeviceInitSetShutdownNotification(DeviceInit,
+        NonPnpShutdown,
+        WdfDeviceShutdown);
     /*
      * Initialize PnP-power callbacks, attributes and a context area
      * for the device object.
@@ -146,12 +170,43 @@ Return Value:
     WdfDeviceInitSetPnpPowerEventCallbacks(DeviceInit, &pnpPowerCallbacks);
     KdPrint(("Josh End To Power call back"));
 
+    //WdfDeviceInitSetExclusive(DeviceInit, TRUE);
+
+    //WdfDeviceInitSetIoType(DeviceInit, WdfDeviceIoBuffered);
+
+    status = WdfDeviceInitAssignName(DeviceInit, &ntDeviceName);
+
+    if (!NT_SUCCESS(status)) {
+        KdPrint(("Josh E WdfDeviceInitAssignName failed %!STATUS!", status));
+        goto End;
+    }
+    //
+   // Initialize WDF_FILEOBJECT_CONFIG_INIT struct to tell the
+   // framework whether you are interested in handling Create, Close and
+   // Cleanup requests that gets generated when an application or another
+   // kernel component opens an handle to the device. If you don't register
+   // the framework default behaviour would be to complete these requests
+   // with STATUS_SUCCESS. A driver might be interested in registering these
+   // events if it wants to do security validation and also wants to maintain
+   // per handle (fileobject) context.
+   //
+
+    WDF_FILEOBJECT_CONFIG_INIT(
+        &fileConfig,
+        HPCustCapEvtDeviceFileCreate,
+        HPCustCapEvtFileClose,
+        WDF_NO_EVENT_CALLBACK // not interested in Cleanup
+    );
+
+    WdfDeviceInitSetFileObjectConfig(DeviceInit,
+        &fileConfig,
+        WDF_NO_OBJECT_ATTRIBUTES);
     //
     // Initialize attributes and a context area for the device object.
     //
     //
     WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&fdoAttributes, FDO_DATA);
-
+    //WDF_OBJECT_ATTRIBUTES_INIT_CONTEXT_TYPE(&fdoAttributes, CONTROL_DEVICE_EXTENSION);
     //
     // Create a framework device object.This call will in turn create
     // a WDM device object, attach to the lower stack, and set the
@@ -159,10 +214,19 @@ Return Value:
     //
     status = WdfDeviceCreate(&DeviceInit, &fdoAttributes, &hDevice);
     if (!NT_SUCCESS(status)) {
-        KdPrint( ("WdfDeviceCreate failed with status code 0x%x\n", status));
-        return status;
+        KdPrint( ("Josh E WdfDeviceCreate failed with status code 0x%x\n", status));
+        //return status;
+        goto End;
     }
+    status = WdfDeviceCreateSymbolicLink(hDevice, &symbolicLinkName);
 
+    if (!NT_SUCCESS(status)) {
+        //
+        // Control device will be deleted automatically by the framework.
+        //
+        KdPrint(( "Josh E WdfDeviceCreateSymbolicLink failed %!STATUS!", status));
+        goto End;
+    }
     //
     // Get the device context by using the accessor function specified in
     // the WDF_DECLARE_CONTEXT_TYPE_WITH_NAME macro for FDO_DATA.
@@ -179,8 +243,9 @@ Return Value:
              );
 
     if (!NT_SUCCESS (status)) {
-        KdPrint( ("WdfDeviceCreateDeviceInterface failed 0x%x\n", status));
-        return status;
+        KdPrint( ("Josh E WdfDeviceCreateDeviceInterface failed 0x%x\n", status));
+        //return status;
+        goto End;
     }
 
     //
@@ -201,6 +266,8 @@ Return Value:
     queueConfig.EvtIoRead = HPCustCapEvtIoRead;
     queueConfig.EvtIoWrite = HPCustCapEvtIoWrite;
     queueConfig.EvtIoDeviceControl = HPCustCapEvtIoDeviceControl;
+
+    WDF_OBJECT_ATTRIBUTES_INIT(&fdoAttributes);
 
     //
     // By default, Static Driver Verifier (SDV) displays a warning if it 
@@ -223,17 +290,28 @@ Return Value:
     status = WdfIoQueueCreate(
         hDevice,
         &queueConfig,
-        WDF_NO_OBJECT_ATTRIBUTES,
+        &fdoAttributes,
         &queue
         );
     __analysis_assume(queueConfig.EvtIoStop == 0);
 
     if (!NT_SUCCESS (status)) {
 
-        KdPrint( ("WdfIoQueueCreate failed 0x%x\n", status));
-        return status;
+        KdPrint( ("Josh E WdfIoQueueCreate failed 0x%x\n", status));
+        //return status;
+        goto End;
     }
 
+End:
+    //
+    // If the device is created successfully, framework would clear the
+    // DeviceInit value. Otherwise device create must have failed so we
+    // should free the memory ourself.
+    //
+    if (DeviceInit != NULL) {
+        WdfDeviceInitFree(DeviceInit);
+    }
+    KdPrint(("Josh Add Good 0x%x\n", status));
     return status;
 }
 /**
@@ -324,6 +402,15 @@ HPDriverEvtDeviceD0Exit(IN WDFDEVICE Device,
     KdPrint(("Josh HPDriverEvtDeviceD0Exit... %d \n", TargetState));
     TestEditRegistry();
     return STATUS_SUCCESS;
+}
+VOID
+NonPnpShutdown(
+    WDFDEVICE Device
+)
+{
+    KdPrint(("Josh NonPnpShutdown... \n"));
+    TestEditRegistry();
+    return;
 }
 
 VOID
@@ -545,7 +632,7 @@ Return Value:
     //UNREFERENCED_PARAMETER(OutputBufferLength);
     //UNREFERENCED_PARAMETER(InputBufferLength);
 
-    KdPrint(("HPCustCapEvtIoDeviceControl called\n"));
+    KdPrint(("Josh HPCustCapEvtIoDeviceControl called\n"));
 
     PAGED_CODE();
     KdPrint(("HPCustCapEvtIoDeviceControl IOCTL_NONPNP_METHOD_BUFFERED called\n"));
@@ -588,4 +675,169 @@ Return Value:
     //
     //WdfRequestCompleteWithInformation(Request, status, (ULONG_PTR) 0);
     WdfRequestComplete(Request, status);
+}
+VOID
+HPCustCapEvtDeviceFileCreate(
+    IN WDFDEVICE            Device,
+    IN WDFREQUEST Request,
+    IN WDFFILEOBJECT        FileObject
+)
+/*++
+
+Routine Description:
+
+    The framework calls a driver's EvtDeviceFileCreate callback
+    when it receives an IRP_MJ_CREATE request.
+    The system sends this request when a user application opens the
+    device to perform an I/O operation, such as reading or writing a file.
+    This callback is called synchronously, in the context of the thread
+    that created the IRP_MJ_CREATE request.
+
+Arguments:
+
+    Device - Handle to a framework device object.
+    FileObject - Pointer to fileobject that represents the open handle.
+    CreateParams - Parameters of IO_STACK_LOCATION for create
+
+Return Value:
+
+   NT status code
+
+--*/
+{
+    PUNICODE_STRING             fileName;
+    UNICODE_STRING              absFileName, directory;
+    OBJECT_ATTRIBUTES           fileAttributes;
+    IO_STATUS_BLOCK             ioStatus;
+    PFDO_DATA                   devExt;
+    NTSTATUS                    status;
+    USHORT                      length = 0;
+
+
+    UNREFERENCED_PARAMETER(FileObject);
+
+    PAGED_CODE();
+
+    devExt = HPCustCapFdoGetData(Device);
+    KdPrint(("Josh HPCustCapEvtFileClose called\n"));
+    //
+    // Assume the directory is a temp directory under %windir%
+    //
+    RtlInitUnicodeString(&directory, L"\\SystemRoot\\temp");
+
+    //
+    // Parsed filename has "\" in the begining. The object manager strips
+    // of all "\", except one, after the device name.
+    //
+    fileName = WdfFileObjectGetFileName(FileObject);
+    KdPrint(("Josh NonPnpEvtDeviceFileCreate %wZ%wZ\n", &directory, fileName));
+    //
+    // Find the total length of the directory + filename
+    //
+    length = directory.Length + fileName->Length;
+
+    absFileName.Buffer = ExAllocatePool2(POOL_FLAG_PAGED, length, POOL_TAG);
+    if (absFileName.Buffer == NULL) {
+        status = STATUS_INSUFFICIENT_RESOURCES;
+        //TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT, "ExAllocatePool2 failed");
+        goto End;
+    }
+    absFileName.Length = 0;
+    absFileName.MaximumLength = length;
+
+    status = RtlAppendUnicodeStringToString(&absFileName, &directory);
+    if (!NT_SUCCESS(status)) {
+        /*TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT,
+            "RtlAppendUnicodeStringToString failed with status %!STATUS!",
+            status);*/
+        goto End;
+    }
+
+    status = RtlAppendUnicodeStringToString(&absFileName, fileName);
+    if (!NT_SUCCESS(status)) {
+        /*TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT,
+            "RtlAppendUnicodeStringToString failed with status %!STATUS!",
+            status);*/
+        goto End;
+    }
+
+    //TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT, "Absolute Filename %wZ", &absFileName);
+
+    InitializeObjectAttributes(&fileAttributes,
+        &absFileName,
+        OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
+        NULL, // RootDirectory
+        NULL // SecurityDescriptor
+    );
+
+    status = ZwCreateFile(
+        &devExt->FileHandle,
+        SYNCHRONIZE | GENERIC_WRITE | GENERIC_READ,
+        &fileAttributes,
+        &ioStatus,
+        NULL,// alloc size = none
+        FILE_ATTRIBUTE_NORMAL,
+        FILE_SHARE_READ,
+        FILE_OPEN_IF,
+        FILE_SYNCHRONOUS_IO_NONALERT | FILE_NON_DIRECTORY_FILE,
+        NULL,// eabuffer
+        0// ealength
+    );
+
+    if (!NT_SUCCESS(status)) {
+
+        /*TraceEvents(TRACE_LEVEL_ERROR, DBG_INIT,
+            "ZwCreateFile failed with status %!STATUS!", status);*/
+        devExt->FileHandle = NULL;
+    }
+
+
+End:
+    if (absFileName.Buffer != NULL) {
+        ExFreePool(absFileName.Buffer);
+    }
+
+    WdfRequestComplete(Request, status);
+
+    return;
+}
+VOID
+HPCustCapEvtFileClose(
+    IN WDFFILEOBJECT    FileObject
+)
+/*++
+
+Routine Description:
+
+   EvtFileClose is called when all the handles represented by the FileObject
+   is closed and all the references to FileObject is removed. This callback
+   may get called in an arbitrary thread context instead of the thread that
+   called CloseHandle. If you want to delete any per FileObject context that
+   must be done in the context of the user thread that made the Create call,
+   you should do that in the EvtDeviceCleanp callback.
+
+Arguments:
+
+    FileObject - Pointer to fileobject that represents the open handle.
+
+Return Value:
+
+   VOID
+
+--*/
+{
+    PFDO_DATA devExt;
+
+    PAGED_CODE();
+
+    KdPrint(("Josh HPCustCapEvtFileClose called\n"));
+
+    devExt = HPCustCapFdoGetData(WdfFileObjectGetDevice(FileObject));
+
+    if (devExt->FileHandle) {
+       /* TraceEvents(TRACE_LEVEL_VERBOSE, DBG_INIT,
+            "Closing File Handle %p", devExt->FileHandle);*/
+        ZwClose(devExt->FileHandle);
+    }
+    return;
 }
