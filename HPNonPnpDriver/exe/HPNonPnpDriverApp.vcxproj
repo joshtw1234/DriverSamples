@@ -26,7 +26,7 @@
     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
     <Platform Condition="'$(Platform)' == ''">Win32</Platform>
     <SampleGuid>{F5414C9C-6CDE-4673-879E-27AD5A30C4C5}</SampleGuid>
-    <ProjectName>HPNonPnpDriverApp</ProjectName>
+    <ProjectName>NonPnpDriverApp</ProjectName>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
