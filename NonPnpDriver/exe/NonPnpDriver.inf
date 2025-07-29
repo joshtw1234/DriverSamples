@@ -1,0 +1,8 @@
+[Version]
+Signature="$WINDOWS NT$"
+
+[HPNonPnpDriver.NT.Wdf]
+KmdfService = NonPnpDriver, NonPnpDriver_Service_kmdfInst
+
+[NonPnpDriver_Service_kmdfInst]
+KmdfLibraryVersion = 1.11
