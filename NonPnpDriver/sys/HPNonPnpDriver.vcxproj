@@ -92,10 +92,10 @@
     </OtherWpp>
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>HPNonPnpDriver</TargetName>
+    <TargetName>NonPnpDriver</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>HPNonPnpDriver</TargetName>
+    <TargetName>NonPnpDriver</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <TargetName>nonpnp</TargetName>

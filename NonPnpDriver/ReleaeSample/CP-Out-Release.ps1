@@ -22,7 +22,7 @@ $PARAM='/Y/D/S'
 
 
 xcopy $PARAM ..\exe\x64\$DebugROOT\*.exe .
-xcopy $PARAM ..\sys\x64\$DebugROOT\HPNonPnpDriver\*.sys .
+xcopy $PARAM ..\sys\x64\$DebugROOT\NonPnpDriver\*.sys .
 xcopy $PARAM ..\exe\x64\$DebugROOT\*.pdb .
 xcopy $PARAM ..\sys\x64\$DebugROOT\*.pdb .
 xcopy $PARAM "C:\Program Files (x86)\Windows Kits\8.0\redist\wdf\x64\WdfCoInstaller01011.dll" .
