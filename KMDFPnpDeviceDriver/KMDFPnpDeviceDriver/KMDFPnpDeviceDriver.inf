@@ -7,7 +7,7 @@ Signature   = "$WINDOWS NT$"
 Class       = System ; TODO: specify appropriate Class
 ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
 Provider    = %ManufacturerName%
-CatalogFile = KMDFPnpDeviceDriver.cat
+CatalogFile = KMDFPnpDeviceDriverx64.cat
 DriverVer   = ; TODO: set DriverVer in stampinf property pages
 PnpLockdown = 1
 
@@ -18,7 +18,7 @@ DefaultDestDir = 13
 1 = %DiskName%,,,""
 
 [SourceDisksFiles]
-KMDFPnpDeviceDriver.sys  = 1,,
+KMDFPnpDeviceDriverx64.sys  = 1,,
 
 ;*****************************************
 ; Install Section
@@ -34,7 +34,7 @@ KMDFPnpDeviceDriver.sys  = 1,,
 CopyFiles = File_Copy
 
 [File_Copy]
-KMDFPnpDeviceDriver.sys
+KMDFPnpDeviceDriverx64.sys
 
 ;-------------- Service installation
 [KMDFPnpDeviceDriver_Device.NT.Services]
@@ -46,7 +46,7 @@ DisplayName    = %KMDFPnpDeviceDriver.SVCDESC%
 ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
 StartType      = 3               ; SERVICE_DEMAND_START
 ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
-ServiceBinary  = %13%\KMDFPnpDeviceDriver.sys
+ServiceBinary  = %13%\KMDFPnpDeviceDriverx64.sys
 
 [KMDFPnpDeviceDriver_Device.NT.Wdf]
 KmdfService = KMDFPnpDeviceDriver, KMDFPnpDeviceDriver_wdfsect
