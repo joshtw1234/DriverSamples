@@ -56,7 +56,7 @@ KmdfLibraryVersion = $KMDFVERSION$
 
 [Strings]
 SPSVCINST_ASSOCSERVICE = 0x00000002
-ManufacturerName = "<Your manufacturer name>" ;TODO: Replace with your manufacturer name
+ManufacturerName = "KMDF Pnp Device Driver" ;TODO: Replace with your manufacturer name
 DiskName = "KMDFPnpDeviceDriver Installation Disk"
 KMDFPnpDeviceDriver.DeviceDesc = "KMDFPnpDeviceDriver Device"
 KMDFPnpDeviceDriver.SVCDESC = "KMDFPnpDeviceDriver Service"
