@@ -33,7 +33,7 @@ typedef struct _DEVICE_CONTEXT
 // which will be used to get a pointer to the device context memory
 // in a type safe manner.
 //
-WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(DEVICE_CONTEXT, DeviceGetContext)
+WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(DEVICE_CONTEXT, PnpDeviceGetContext)
 
 //
 // Function to initialize the device and its callbacks
@@ -42,5 +42,13 @@ NTSTATUS
 KMDFPnpDeviceDriverCreateDevice(
     _Inout_ PWDFDEVICE_INIT DeviceInit
     );
-
+/// <summary>
+/// Pnp device event for context cleanup
+/// </summary>
+EVT_WDF_DEVICE_CONTEXT_CLEANUP PnpDeviceEvtDeviceContextCleanup;
+/// <summary>
+/// Pnp Device Power Events
+/// </summary>
+EVT_WDF_DEVICE_D0_ENTRY PnpDeviceEvtDeviceD0Entry;
+EVT_WDF_DEVICE_D0_EXIT PnpDeviceEvtDeviceD0Exit;
 EXTERN_C_END

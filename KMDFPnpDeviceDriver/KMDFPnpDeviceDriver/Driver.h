@@ -39,8 +39,8 @@ EVT_WDF_OBJECT_CONTEXT_CLEANUP KMDFPnpDeviceDriverEvtDriverContextCleanup;
 // specific instance of the device for filtering.
 // Need this for PASS SDV test.
 //
-WDFCOLLECTION   HPBaseDriverDeviceCollection;
-WDFWAITLOCK     HPBaseDriverDeviceCollectionLock;
+WDFCOLLECTION   DriverDeviceCollection;
+WDFWAITLOCK     DriverDeviceCollectionLock;
 
 //
 // ControlDevice provides a sideband communication to the filter from
