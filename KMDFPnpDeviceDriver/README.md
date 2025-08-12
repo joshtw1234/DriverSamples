@@ -1,8 +1,4 @@
-# HP OMEN Driver (base of HP device driver)
-
-Refer below source code.
-https://github.azc.ext.hp.com/PSSW/win-drv-hpcustomcapdriver/blob/master/hpcustomcapdriver/hpcustomcapdriver.c
-
+# KMDF Pnp Driver
 
 # How to generate Driver Verification Log (DVL)
 
