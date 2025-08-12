@@ -16,10 +16,12 @@ Environment:
 
 #include <ntddk.h>
 #include <wdf.h>
+#include <wdmsec.h> // for SDDLs
 #include <initguid.h>
 
 #include "public.h"
 #include "device.h"
+#include "ControlDevice.h"
 #include "queue.h"
 #include "trace.h"
 

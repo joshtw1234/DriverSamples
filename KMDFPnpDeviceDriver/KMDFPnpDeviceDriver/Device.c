@@ -19,6 +19,9 @@ Environment:
 
 #ifdef ALLOC_PRAGMA
 #pragma alloc_text (PAGE, KMDFPnpDeviceDriverCreateDevice)
+#pragma alloc_text (PAGE, PnpDeviceEvtDeviceD0Entry)
+#pragma alloc_text (PAGE, PnpDeviceEvtDeviceD0Exit)
+#pragma alloc_text (PAGE, PnpDeviceEvtDeviceContextCleanup)
 #endif
 
 NTSTATUS
@@ -103,6 +106,19 @@ Return Value:
         }
         WdfWaitLockRelease(DriverDeviceCollectionLock);
 
+        //
+        // Create a control device
+        //
+        status = KMDFPnpDeviceDriverCreateControlDevice(device);
+        if (!NT_SUCCESS(status)) {
+            KdPrint(("FilterCreateControlDevice failed with status 0x%x\n",
+                status));
+            //
+            // Let us not fail AddDevice just because we weren't able to create the
+            // control device.
+            //
+            status = STATUS_SUCCESS;
+        }
 #if false
         //
         // Create a device interface so that applications can find and talk
@@ -213,7 +229,7 @@ Return Value:
         // deleting the device.
         // Need This for PASS SDV test
         //
-        //HPBaseDriverDeleteControlDevice((WDFDEVICE)Device);
+        KMDFPnpDeviceDriverDeleteControlDevice((WDFDEVICE)Device);
     }
 
     WdfCollectionRemove(DriverDeviceCollection, Device);
