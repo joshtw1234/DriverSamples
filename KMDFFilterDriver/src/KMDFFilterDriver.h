@@ -9,7 +9,7 @@ Copyright (c) Microsoft Corporation.  All rights reserved.
 
 Module Name:
 
-    filter.h
+    KMDFFilterDriver.h
 
 Abstract:
 
